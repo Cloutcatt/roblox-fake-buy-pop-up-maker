@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Roblox Prompt Generator</title>
+<style>
+  body {
+    background-color: #121314;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    gap: 30px;
+  }
+
+  /* Control Panel */
+  .control-panel {
+    background-color: #1e2022;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .control-group label {
+    font-size: 13px;
+    color: #a0a0a0;
+    font-weight: bold;
+  }
+  .control-panel input {
+    padding: 8px;
+    background-color: #2b2d30;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: white;
+    font-size: 14px;
+  }
+
+  /* Prompt Panel */
+  .roblox-prompt {
+    width: 420px;
+    background-color: #232527;
+    border-radius: 8px;
+    padding: 20px;
+    color: #FFFFFF;
+    text-align: center;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.6);
+    box-sizing: border-box;
+  }
+  .header {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+  .line {
+    height: 1px;
+    background-color: #393B3D;
+    margin-bottom: 25px;
+    width: 100%;
+  }
+  
+  /* Borderless Image Container (White Outline Removed) */
+  .icon-circle {
+    width: 90px;
+    height: 90px;
+    border: none; /* Explicitly removed white border outline */
+    border-radius: 50%;
+    margin: 0 auto 25px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background-color: #1b1d1f;
+  }
+  .icon-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+  }
+  
+  .prompt-text {
+    font-size: 16px;
+    color: #BDC3C7;
+    margin-bottom: 30px;
+    line-height: 1.4;
+  }
+  .item-name {
+    color: #FFFFFF;
+    font-weight: bold;
+  }
+  
+  /* Action Buttons */
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+  }
+  .btn-cancel {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #555759;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .btn-buy {
+    flex: 1;
+    padding: 12px;
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    color: #000000;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  
+  /* Rendered Vector Graphic matching 9b14ec704d1116bc502d0e67bfd5e31b_2.jpg */
+  .robux-icon-custom {
+    width: 20px;
+    height: 20px;
+    background-color: #232527;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .robux-ring {
+    width: 14px;
+    height: 14px;
+    background-color: white;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .robux-core {
+    width: 10px;
+    height: 10px;
+    background-color: #232527;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .robux-center-square {
+    width: 4px;
+    height: 4px;
+    background-color: white;
+  }
+</style>
+</head>
+<body>
+
+  <div class="control-panel">
+    <div class="control-group">
+      <label for="input-name">Item Name</label>
+      <input type="text" id="input-name" value="" placeholder="Type tool name...">
+    </div>
+    <div class="control-group">
+      <label for="input-price">Robux Cost</label>
+      <input type="number" id="input-price" value="" placeholder="Type price...">
+    </div>
+    <div class="control-group">
+      <label for="input-file">Upload Tool Icon (.png / .jpg)</label>
+      <input type="file" id="input-file" accept="image/*">
+    </div>
+  </div>
+
+  <div class="roblox-prompt">
+    <div class="header">Buy Item</div>
+    <div class="line"></div>
+    
+    <div class="icon-circle">
+      <img id="output-image" src="" alt="Icon">
+    </div> 
+    
+    <div class="prompt-text">Would you like to buy <span id="output-name" class="item-name">""</span>?</div>
+    
+    <div class="buttons">
+      <button class="btn-cancel">Cancel</button>
+      <button class="btn-buy">
+        <!-- Exact Double Hexagon + Square Center Vector Architecture -->
+        <div class="robux-icon-custom">
+          <div class="robux-ring">
+            <div class="robux-core">
+              <div class="robux-center-square"></div>
+            </div>
+          </div>
+        </div>
+        <span id="output-price"></span>
+      </button>
+    </div>
+  </div>
+
+<script>
+  const inputName = document.getElementById('input-name');
+  const inputPrice = document.getElementById('input-price');
+  const inputFile = document.getElementById('input-file');
+
+  const outputName = document.getElementById('output-name');
+  const outputPrice = document.getElementById('output-price');
+  const outputImage = document.getElementById('output-image');
+
+  inputName.addEventListener('input', () => {
+    outputName.textContent = `"${inputName.value}"`;
+  });
+
+  inputPrice.addEventListener('input', () => {
+    outputPrice.textContent = inputPrice.value;
+  });
+
+  inputFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        outputImage.src = event.target.result;
+        outputImage.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+
+</body>
+</html>
