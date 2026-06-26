@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Roblox Prompt Generator</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   body {
     background-color: #121314;
@@ -47,6 +48,23 @@
     font-size: 14px;
   }
 
+  /* Download Button Styling */
+  .btn-download {
+    margin-top: 5px;
+    padding: 12px;
+    background-color: #0084ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-download:hover {
+    background-color: #0066d6;
+  }
+
   /* Prompt Panel */
   .roblox-prompt {
     width: 420px;
@@ -71,11 +89,11 @@
     width: 100%;
   }
   
-  /* Borderless Image Container (White Outline Removed) */
+  /* Borderless Image Container */
   .icon-circle {
     width: 90px;
     height: 90px;
-    border: none; /* Explicitly removed white border outline */
+    border: none;
     border-radius: 50%;
     margin: 0 auto 25px auto;
     display: flex;
@@ -96,6 +114,7 @@
     color: #BDC3C7;
     margin-bottom: 30px;
     line-height: 1.4;
+    word-break: break-word; /* Wrap characters nicely just in case */
   }
   .item-name {
     color: #FFFFFF;
@@ -131,42 +150,25 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     cursor: pointer;
+    min-width: 0; /* Prevents overflow inside flexing row layouts */
   }
   
-  /* Rendered Vector Graphic matching 9b14ec704d1116bc502d0e67bfd5e31b_2.jpg */
-  .robux-icon-custom {
-    width: 20px;
-    height: 20px;
-    background-color: #232527;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  /* SVG Icon adjustments */
+  .robux-svg {
+    width: 22px;
+    height: 22px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
   }
-  .robux-ring {
-    width: 14px;
-    height: 14px;
-    background-color: white;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .robux-core {
-    width: 10px;
-    height: 10px;
-    background-color: #232527;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .robux-center-square {
-    width: 4px;
-    height: 4px;
-    background-color: white;
+  
+  /* Prevent numerical text string popping out of container boxes */
+  #output-price {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>
 </head>
@@ -174,20 +176,21 @@
 
   <div class="control-panel">
     <div class="control-group">
-      <label for="input-name">Item Name</label>
-      <input type="text" id="input-name" value="" placeholder="Type tool name...">
+      <label for="input-name">Item Name (Max 40 Letters)</label>
+      <input type="text" id="input-name" value="" maxlength="40" placeholder="Type tool name...">
     </div>
     <div class="control-group">
-      <label for="input-price">Robux Cost</label>
-      <input type="number" id="input-price" value="" placeholder="Type price...">
+      <label for="input-price">Robux Cost (Max 14 Digits)</label>
+      <input type="number" id="input-price" value="" min="0" max="99999999999999" placeholder="Type price...">
     </div>
     <div class="control-group">
       <label for="input-file">Upload Tool Icon (.png / .jpg)</label>
       <input type="file" id="input-file" accept="image/*">
     </div>
+    <button class="btn-download" id="btn-download">Download Image</button>
   </div>
 
-  <div class="roblox-prompt">
+  <div class="roblox-prompt" id="roblox-prompt">
     <div class="header">Buy Item</div>
     <div class="line"></div>
     
@@ -200,14 +203,12 @@
     <div class="buttons">
       <button class="btn-cancel">Cancel</button>
       <button class="btn-buy">
-        <!-- Exact Double Hexagon + Square Center Vector Architecture -->
-        <div class="robux-icon-custom">
-          <div class="robux-ring">
-            <div class="robux-core">
-              <div class="robux-center-square"></div>
-            </div>
-          </div>
-        </div>
+        <svg class="robux-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 2L93.3 27V77L50 102L6.7 77V27L50 2Z" fill="#232527"/>
+          <path d="M50 14L81.2 32V68L50 86L18.8 68V32L50 14Z" fill="#FFFFFF"/>
+          <path d="M50 22L74.3 36V64L50 78L25.7 64V36L50 22Z" fill="#232527"/>
+          <rect x="38" y="38" width="24" height="24" fill="#FFFFFF"/>
+        </svg>
         <span id="output-price"></span>
       </button>
     </div>
@@ -217,16 +218,26 @@
   const inputName = document.getElementById('input-name');
   const inputPrice = document.getElementById('input-price');
   const inputFile = document.getElementById('input-file');
+  const btnDownload = document.getElementById('btn-download');
 
   const outputName = document.getElementById('output-name');
   const outputPrice = document.getElementById('output-price');
   const outputImage = document.getElementById('output-image');
+  const robloxPrompt = document.getElementById('roblox-prompt');
 
+  // Caps name update rendering at 40 characters maximum length
   inputName.addEventListener('input', () => {
+    if (inputName.value.length > 40) {
+      inputName.value = inputName.value.slice(0, 40);
+    }
     outputName.textContent = `"${inputName.value}"`;
   });
 
+  // Limits the input and visual display strictly to 14 numbers max
   inputPrice.addEventListener('input', () => {
+    if (inputPrice.value.length > 14) {
+      inputPrice.value = inputPrice.value.slice(0, 14);
+    }
     outputPrice.textContent = inputPrice.value;
   });
 
@@ -240,6 +251,20 @@
       }
       reader.readAsDataURL(file);
     }
+  });
+
+  btnDownload.addEventListener('click', () => {
+    const fileName = inputName.value ? `roblox_prompt_${inputName.value.replace(/\s+/g, '_')}.png` : 'roblox_prompt.png';
+
+    html2canvas(robloxPrompt, {
+      backgroundColor: null,
+      scale: 3
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = fileName;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
   });
 </script>
 
